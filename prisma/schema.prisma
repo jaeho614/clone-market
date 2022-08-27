@@ -3,9 +3,21 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model User{
+  id Int @id @default(autoincrement())  //공식문서에 @-- 에 관한 설명이 나와있다.
+  phone Int? @unique
+  email String? @unique
+  name String
+  avatar String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
