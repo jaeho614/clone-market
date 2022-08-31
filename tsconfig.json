@@ -13,7 +13,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    //tsconfig 파일을 수정 했을 경우에는 서버를 죽이고 재시작 해줘야 한다.
+    "baseUrl": ".", //import를 간소화 하기위한 첫번째 단계
+    //두번째, 파일과 component를 어떻게 import할지 정할것.
+    "paths": {
+      "@libs/*": ["libs/*"],
+      "@components/*": ["components/*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
