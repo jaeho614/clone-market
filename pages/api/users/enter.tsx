@@ -5,20 +5,23 @@ import { NextApiRequest, NextApiResponse } from "next";
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { phone, email } = req.body;
   const payload = phone ? { phone: +phone } : { email }; //phone가 있다면 phone: +phone를 return 한다. 아니면 eamil을 return 한다. e6 기능으로 객체 안에서 if else와 같은 기능을 사용 할 수 있다.
-  const user = await client.user.upsert({
-    //upsert는 뭔가 만들 때 사용하지 않고, 생성하거나 수정할 때 사용한다.
-    where: {
-      //phone 정보를 갖고있는 user를 찾고
-      ...payload,
+  const token = await client.token.create({
+    data: {
+      payload: "1234",
+      user: {
+        connectOrCreate: {
+          where: {
+            ...payload,
+          },
+          create: {
+            name: "Anonymous",
+            ...payload,
+          },
+        },
+      },
     },
-    create: {
-      // 만약 찾지 못하면 새 user를 만들 것이다.
-      name: "Anonymous",
-      ...payload,
-    },
-    update: {}, //update는 하지 않을것이기 떄문에 그냥 둔다.
   });
-  console.log(user);
+  console.log(token);
   /* if (email) {
     user = await client.user.findUnique({
       //findUnique로 user를 찾는다
