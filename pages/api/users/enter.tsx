@@ -1,27 +1,42 @@
+import twilio from "twilio";
 import client from "@libs/server/client";
-import withHandler from "@libs/server/withHandler";
+import withHandler, { ResponseType } from "@libs/server/withHandler";
 import { NextApiRequest, NextApiResponse } from "next";
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseType>
+) {
   const { phone, email } = req.body;
-  const payload = phone ? { phone: +phone } : { email }; //phone가 있다면 phone: +phone를 return 한다. 아니면 eamil을 return 한다. e6 기능으로 객체 안에서 if else와 같은 기능을 사용 할 수 있다.
+  const user = phone ? { phone: +phone } : email ? { email } : null; //phone가 있다면 phone: +phone를 return 한다. 아니면 eamil을 return 한다. e6 기능으로 객체 안에서 if else와 같은 기능을 사용 할 수 있다.
+  if (!user) return res.status(400).json({ ok: false });
+  const payload = Math.floor(100000 + Math.random() * 900000) + ""; // 뒤에 "" 를 더해주면 숫자가 문자열로 바뀐다.
   const token = await client.token.create({
     data: {
-      payload: "1234",
+      payload,
       user: {
         connectOrCreate: {
           where: {
-            ...payload,
+            ...user,
           },
           create: {
             name: "Anonymous",
-            ...payload,
+            ...user,
           },
         },
       },
     },
   });
-  console.log(token);
+  if (phone) {
+    const message = await twilioClient.messages.create({
+      messagingServiceSid: process.env.TWILIO_MSID, // id 설정
+      to: process.env.MY_PHONE!, //누구에게 보낼지, 뒤에 !는 타입스크립트에 MY_PHONE이라는 변수가 확실히 존재한다는 것을 알리는 것.
+      body: `Your login token is ${payload}`,
+    });
+    console.log(message);
+  }
   /* if (email) {
     user = await client.user.findUnique({
       //findUnique로 user를 찾는다
@@ -64,7 +79,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   } */
   //Next js에서 api route를 만들 때는 export default해줘야 한다. 그렇지 않으면 누군가 api에 접속했을 때 next js에 의해 호출되지 않는다. HOF 참조
   console.log(req.body); //req.body가 req의 인코딩을 기준으로 인코딩된다. 그래서 req.body.email을 하면 undifined가 나오는데 이를 해결하기 위해 프론트엔드에 headers를 설정해줘야 한다.
-  return res.status(200).end();
+  return res.json({
+    ok: true,
+  });
 }
 
 export default withHandler("POST", handler);
