@@ -14,7 +14,7 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement()) //공식문서에 @-- 에 관한 설명이 나와있다.
-  phone     Int?     @unique
+  phone     BigInt?  @unique
   email     String?  @unique
   name      String
   avatar    String?
