@@ -26,7 +26,8 @@ model User {
 model Token {
   id        Int      @id @default(autoincrement())
   payload   String   @unique
-  user      User     @relation(fields: [userId], references: [id]) //위에 있는 model 이름과 같은 User를 써주고 자동완성 기능을 이용해 입력하면 된다. 자동완성 안될경우 User까지 써우고 npx prisma format 해주면 뒤에 완성된다.
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) //위에 있는 model 이름과 같은 User를 써주고 자동완성 기능을 이용해 입력하면 된다. 자동완성 안될경우 User까지 써우고 npx prisma format 해주면 뒤에 완성된다.
+  //onDelete: Cascade 에서 Cascade는 prisma studio에서 유저값이 삭제되면 토큰도 같이 삭제되게 하는 기능이다. 수정후 npx prisma db push를 해줘야 한다.
   userId    Int // user 와 userId가 있는 이유는 db에 실제 user 전체 데이터가 들어가지 않기 떄문이다.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

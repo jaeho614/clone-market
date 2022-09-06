@@ -33,21 +33,21 @@ async function handler(
     },
   });
   if (phone) {
-    const message = await twilioClient.messages.create({
+    /* const message = await twilioClient.messages.create({
       messagingServiceSid: process.env.TWILIO_MSID, // id 설정
       to: process.env.MY_PHONE!, //누구에게 보낼지, 뒤에 !는 타입스크립트에 MY_PHONE이라는 변수가 확실히 존재한다는 것을 알리는 것.
       body: `Your login token is ${payload}`,
     });
-    console.log(message);
+    console.log(message); */
   } else if (email) {
-    const email = await mail.send({
+    /* const email = await mail.send({
       from: "jaeho614a@gmail.com",
       to: "milkyway614@naver.com",
       subject: "Your Carrot Market Verification Email",
       text: `Your token is ${payload}`,
       html: `<strong>Your token is ${payload}</strong>`,
     });
-    console.log(email);
+    console.log(email); */
   }
   /* if (email) {
     user = await client.user.findUnique({
