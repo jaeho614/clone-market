@@ -14,7 +14,10 @@ async function handler(
     },
   });
   if (!exists) res.status(404).end();
-  console.log(exists);
+  req.session.user = {
+    id: exists?.userId,
+  };
+  await req.session.save();
   res.status(200).end();
 }
 
