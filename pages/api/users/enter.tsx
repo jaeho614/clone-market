@@ -96,5 +96,5 @@ async function handler(
   });
 }
 
-export default withHandler("POST", handler);
+export default withHandler({ method: "POST", handler, isPrivate: false });
 //next js 에서 실행 될 function을 맞춤 설정한것.
