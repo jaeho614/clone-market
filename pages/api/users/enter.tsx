@@ -13,7 +13,7 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const { phone, email } = req.body;
-  const user = phone ? { phone: +phone } : email ? { email } : null; //phone가 있다면 phone: +phone를 return 한다. 아니면 eamil을 return 한다. e6 기능으로 객체 안에서 if else와 같은 기능을 사용 할 수 있다.
+  const user = phone ? { phone } : email ? { email } : null; //phone? { phone : +phone} 에서 phone로 수정됨. 주석은 수정전 내용/phone가 있다면 phone: +phone를 return 한다. 아니면 eamil을 return 한다. e6 기능으로 객체 안에서 if else와 같은 기능을 사용 할 수 있다.
   if (!user) return res.status(400).json({ ok: false });
   const payload = Math.floor(100000 + Math.random() * 900000) + ""; // 뒤에 "" 를 더해주면 숫자가 문자열로 바뀐다.
   const token = await client.token.create({
