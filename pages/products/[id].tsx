@@ -2,11 +2,12 @@ import type { NextPage } from "next";
 import Button from "@components/button";
 import Layout from "@components/layout";
 import { useRouter } from "next/router";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import Link from "next/link";
 import { Product, User } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
+import useUser from "@libs/client/useUser";
 import Id from "pages/api/products/[id]";
 
 interface ProductWithUser extends Product {
@@ -21,15 +22,18 @@ interface ItemDetailResponse {
 }
 
 const ItemDetail: NextPage = () => {
+  const { user, isLoading } = useUser();
   const router = useRouter();
-  const { data, mutate } = useSWR<ItemDetailResponse>( //mutate 하는 이유는 api응답을 기다리지 않고 refresh 없이 빠르게 변화를 적용하기 위해서임.
+  const { mutate } = useSWRConfig();
+  const { data, mutate: boundMutate } = useSWR<ItemDetailResponse>( //mutate 하는 이유는 api응답을 기다리지 않고 refresh 없이 빠르게 변화를 적용하기 위해서임.
     //제한된(bound) mutation function: matate가 여기있는  {"data", mutate}  "data" 만 변경할 수 있다는 뜻.
     router.query.id ? `/api/products/${router.query.id}` : null
   );
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const onFavClick = () => {
     if (!data) return;
-    mutate({ ...data, isLiked: !data.isLiked }, false); //...data를 추가하면 새로운 data에 이전의 data가 추가된다.
+    boundMutate(prev => prev && { ...prev, isLiked: !prev.isLiked }, false); //...data를 추가하면 새로운 data에 이전의 data가 추가된다.
+    //mutate("/api/users/me", (prev: any) => ({ ok: !prev.ok }), false);
     toggleFav({});
   };
   return (
@@ -72,7 +76,7 @@ const ItemDetail: NextPage = () => {
                 {data?.isLiked ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
+                    className="h-6 w-6"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
