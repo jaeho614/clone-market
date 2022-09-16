@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Product, User } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
+import Id from "pages/api/products/[id]";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -21,11 +22,14 @@ interface ItemDetailResponse {
 
 const ItemDetail: NextPage = () => {
   const router = useRouter();
-  const { data, error } = useSWR<ItemDetailResponse>(
+  const { data, mutate } = useSWR<ItemDetailResponse>( //mutate 하는 이유는 api응답을 기다리지 않고 refresh 없이 빠르게 변화를 적용하기 위해서임.
+    //제한된(bound) mutation function: matate가 여기있는  {"data", mutate}  "data" 만 변경할 수 있다는 뜻.
     router.query.id ? `/api/products/${router.query.id}` : null
   );
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const onFavClick = () => {
+    if (!data) return;
+    mutate({ ...data, isLiked: !data.isLiked }, false); //...data를 추가하면 새로운 data에 이전의 data가 추가된다.
     toggleFav({});
   };
   return (
