@@ -7,6 +7,8 @@ import { Answer, Post, User } from "@prisma/client";
 import Link from "next/link";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
+import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 
 interface AnswerWithUser extends Answer {
   user: User;
@@ -28,12 +30,26 @@ interface CommunityPostResponse {
   isWondering: boolean;
 }
 
+interface AnswerForm {
+  answer: string;
+}
+
+interface AnswerResponse {
+  ok: boolean;
+  response: Answer;
+}
+
 const CommunityPostDetail: NextPage = () => {
   const router = useRouter();
+  const { register, handleSubmit, reset } = useForm<AnswerForm>();
   const { data, mutate } = useSWR<CommunityPostResponse>(
     router.query.id ? `/api/posts/${router.query.id}` : null
   ); //router.query.id가끔씩 undifined 일 때가 있다.
-  const [wonder] = useMutation(`/api/posts/${router.query.id}/wonder`);
+  const [wonder, { loading }] = useMutation(
+    `/api/posts/${router.query.id}/wonder`
+  );
+  const [sendAnswer, { data: answerData, loading: answerLoading }] =
+    useMutation<AnswerResponse>(`/api/posts/${router.query.id}/answers`);
   const onWonderClick = () => {
     if (!data) return;
     mutate(
@@ -52,8 +68,20 @@ const CommunityPostDetail: NextPage = () => {
       },
       false //값을 변경하는 동시에 revalidating도 진행된다. 왜냐면 mutate는 캐시에 있는 데이터를 업데이트 하면서 API에 그 데이터가 맞는지 확인하는 request도 보내기떄문. background에 있는 데이터를 업데이트 하고, 가장 최신의 데이터를 API에서 받아오는 것이다. 이를 방지하기 위해 false 해줌.
     );
-    wonder({});
+    if (!loading) {
+      //이렇게 하지 않으면 궁금해요 버튼을 엄청 빨리 누르게되면 삭제요청과 생성요청이 겹쳐져서 문제가 생긴다.(race condition 발생)
+      wonder({});
+    }
   };
+  const onValid = (form: AnswerForm) => {
+    if (answerLoading) return;
+    sendAnswer(form);
+  };
+  useEffect(() => {
+    if (answerData && answerData.ok) {
+      reset();
+    }
+  }, [answerData, reset]);
   return (
     <Layout canGoBack>
       <div>
@@ -137,16 +165,17 @@ const CommunityPostDetail: NextPage = () => {
             </div>
           ))}
         </div>
-        <div className="px-4">
+        <form className="px-4" onSubmit={handleSubmit(onValid)}>
           <TextArea
             name="description"
             placeholder="Answer this question!"
             required
+            register={register("answer", { required: true, minLength: 5 })}
           />
           <button className="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none ">
-            Reply
+            {answerLoading ? "Loading..." : "Reply"}
           </button>
-        </div>
+        </form>
       </div>
     </Layout>
   );
