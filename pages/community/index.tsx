@@ -22,7 +22,9 @@ interface PostWithUser extends Post {
 const Community: NextPage = () => {
   const { latitude, longitude } = useCoords();
   const { data } = useSWR<PostsResponse>(
-    `/api/posts?latitude=${latitude}&longitude=${longitude}`
+    latitude && longitude // 여기서 next.js 와 react-reate-app의 차이점을 알아야한다.
+      ? `/api/posts?latitude=${latitude}&longitude=${longitude}`
+      : null
   );
   return (
     <Layout hasTabBar title="동네생활">
