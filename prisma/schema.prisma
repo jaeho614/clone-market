@@ -69,6 +69,8 @@ model Post {
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   question  String      @db.MediumText
+  latitude Float? //필수로 하지 않는 이유는 주소를 알리고 싶지 않은 사람들을 위한 옵션
+  longitude Float?
   answers   Answer[]
   wondering Wondering[]
 }
