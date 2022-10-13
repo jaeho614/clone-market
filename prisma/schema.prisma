@@ -113,6 +113,7 @@ model Review {
   createdById Int
   createdFor User @relation(name: "receivedReviews", fields: [createdForId], references: [id], onDelete: Cascade)
   createdForId Int
+  score Int @default(1) //**** 매우중요 // 이미 만들어진 모델에 추가로 column을 생성할 경우 에러가 생긴다. 이때 두가지 방법이 있는데 하나는 Int 뒤에 ?를 붙여 줌으로써 required가 아니게 만드는것. 또 하나는 @default(1) 값을 주는것 이다.
 }
 
 model Sale {
