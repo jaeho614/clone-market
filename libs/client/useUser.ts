@@ -1,9 +1,15 @@
+import { User } from "@prisma/client";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
+interface ProfileResponse {
+  ok: boolean;
+  profile: User;
+}
+
 export default function useUser() {
-  const { data, error } = useSWR("/api/users/me"); // useSWR("요청을 보낼 url")
+  const { data, error } = useSWR<ProfileResponse>("/api/users/me"); // useSWR("요청을 보낼 url")
   const router = useRouter();
   useEffect(() => {
     if (data && !data.ok) {
