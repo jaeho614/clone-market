@@ -45,7 +45,7 @@ const Create: NextPage = () => {
           type="text"
         />
         <Input
-          register={register("price", { required: true })}
+          register={register("price", { required: true, valueAsNumber: true })} //react hook form에서 받은 data들은 전부 백엔드에서 string이다. valueAsNumber를 해주면 백엔드에서 number로 받을 수 있다.
           required
           label="Price"
           name="price"
