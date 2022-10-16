@@ -37,18 +37,30 @@ const EditProfile: NextPage = () => {
   }, [user, setValue]);
   const [editProfile, { data, loading }] =
     useMutation<EditProfileResponse>(`/api/users/me`);
-  const onValid = ({ email, phone, name, avatar }: EditProfileForm) => {
+  const onValid = async ({ email, phone, name, avatar }: EditProfileForm) => {
     if (loading) return; //로딩 중이라면 아래 if코드를 아예 실행하지 않을것이다. return 시켜주고 아래코드를 실행하게함.
     if (email === "" && phone === "" && name === "") {
       return setError("formErrors", {
         message: "Email or Phone number are required. You need to choose one.",
       });
     }
-    editProfile({
-      email,
-      phone,
-      name,
-    });
+    if (avatar && avatar.length > 0) {
+      const cloudflareRequest = await (await fetch(`/api/files`)).json();
+      console.log(cloudflareRequest);
+      return;
+      editProfile({
+        email,
+        phone,
+        name,
+        //avatarUrl: CF URL
+      });
+    } else {
+      editProfile({
+        email,
+        phone,
+        name,
+      });
+    }
   };
   useEffect(() => {
     if (data && !data.ok && data.error) {
