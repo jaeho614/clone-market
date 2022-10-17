@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ["imagedelivery.net"], //imagedelivery.net은 CloudFlare 이미지 도메인이다.
+    domains: ["imagedelivery.net", "videodelivery.net"], //imagedelivery.net은 CloudFlare 이미지 도메인이다.
   },
 };
 

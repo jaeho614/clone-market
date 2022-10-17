@@ -46,10 +46,9 @@ async function handler(
     });
     res.json({ ok: true, stream });
   } else if (req.method === "GET") {
-    const streams = await client.stream.findMany({
-      take: 10, //한 번에 stream을 N개 까지만 보이도록 설정, planet scale은 우리의 데이터베이스를 읽을 때마다 요금을 청구한다. 무료버전은 한달에 1억 개의 행만을 읽게 해준다.
-      skip: 10, //앞의 N개를 건너뛰고 그다음 take N개를 가져온다
-    });
+    const streams = await client.stream.findMany({});
+    //take: N  /한 번에 stream을 N개 까지만 보이도록 설정, planet scale은 우리의 데이터베이스를 읽을 때마다 요금을 청구한다. 무료버전은 한달에 1억 개의 행만을 읽게 해준다.
+    //skip: N  /앞의 N개를 건너뛰고 그다음 take N개를 가져온다
     res.json({ ok: true, streams });
   }
 }
