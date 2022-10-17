@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import type { Stream } from "@prisma/client"; //type을 안붙여주면 Stream이 두 번 쓰여서 에러가 난다.
 import useUser from "@libs/client/useUser";
-import { useEffect } from "react";
 
 interface StreamMessage {
   message: string;
@@ -77,6 +76,17 @@ const Stream: NextPage = () => {
             ${data?.stream.price}
           </span>
           <p className=" my-6 text-gray-700">{data?.stream.description}</p>
+          <div className="bg-orange-300 p-5 rounded-md overflow-scroll flex flex-col space-y-3">
+            <span>Stream Keys (secret)</span>
+            <span className="text-gray-600">
+              <span className="font-medium text-gray-800">URL</span>:
+              {data?.stream.cloudflareUrl}
+            </span>
+            <span className="text-gray-600">
+              <span className="font-medium text-gray-800">Key</span>:
+              {data?.stream.cloudflareKey}
+            </span>
+          </div>
         </div>
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Live Chat</h2>
